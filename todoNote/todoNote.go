@@ -8,8 +8,8 @@ import (
 )
 
 type Note struct {
-	ID    int
-	Title string
+	ID    int    `json: "id"`
+	Title string `json: "id"`
 }
 
 var Tasks = make([]Note, 0, 10000)
@@ -49,6 +49,7 @@ func SetNote(idNew *int, t string) *Note {
 	DoJson()
 	return Task
 }
+
 func DoJson() {
 	jsonInf, err := json.Marshal(Tasks)
 	if err != nil {
