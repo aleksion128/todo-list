@@ -20,6 +20,6 @@ func ChangeTask(t models.Task) {
 	tasks[t.Id] = t
 }
 
-func DeleteTask(t models.Task) {
-	delete(tasks, t.Id)
+func DeleteTask(id int) {
+	delete(tasks, id)
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"todoList/models"
 	"todoList/storage"
 
@@ -34,11 +35,11 @@ func UpdateTask(c *gin.Context) {
 }
 
 func DeleteTask(c *gin.Context) {
-	var tsk models.Task
-	if err := c.BindJSON(&tsk); err != nil {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	storage.DeleteTask(tsk)
+	storage.DeleteTask(id)
 	c.Status(http.StatusOK)
 }
