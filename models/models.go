@@ -13,11 +13,3 @@ type User struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-
-type UpdatedUsernameUser struct {
-	Username string `json:"username"`
-}
-
-type UpdatedEmailUser struct {
-	Email string `json:"email"`
-}

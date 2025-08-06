@@ -120,7 +120,7 @@ func UpdateEmail(db *sql.DB, id int, email string) {
 }
 
 func UpdatePassword(db *sql.DB, id int, password string) {
-	err := db.QueryRow(`UPDATE users SET password=$1 WHERE id = $2`, HashPass(password), id)
+	err := db.QueryRow(`UPDATE users SET password_hash=$1 WHERE id = $2`, HashPass(password), id)
 	if err != nil {
 		fmt.Println("Проблемы с обновлением пользователя в базе данных")
 	}
