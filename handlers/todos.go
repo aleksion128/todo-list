@@ -13,7 +13,7 @@ import (
 
 // Task
 func GetTasks(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {
 		log.Println(err)
 	}
@@ -23,20 +23,32 @@ func GetTasks(c *gin.Context) {
 
 func CreateTask(c *gin.Context) {
 	var tsk models.Task
+	userId, err := strconv.Atoi(c.Param("userId"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	if err := c.BindJSON(&tsk); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	tsk.UserID = userId
 	storage.AddTask(databas.ConnectDB(), tsk)
 	c.Status(http.StatusCreated)
 }
 
 func UpdateTask(c *gin.Context) {
 	var tsk models.Task
+	userId, err := strconv.Atoi(c.Param("userId"))
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	if err := c.BindJSON(&tsk); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	tsk.UserID = userId
 	storage.UpdateTask(databas.ConnectDB(), tsk)
 	c.Status(http.StatusOK)
 }
