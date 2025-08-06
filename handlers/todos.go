@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"todoList/databas"
 	"todoList/models"
 	"todoList/storage"
 
@@ -42,4 +43,53 @@ func DeleteTask(c *gin.Context) {
 	}
 	storage.DeleteTask(id)
 	c.Status(http.StatusOK)
+}
+
+func CreateNewUser(c *gin.Context) {
+	var user models.User
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	storage.CreateUser(databas.ConnectDB(), user.Username, user.Email, user.Password)
+	c.Status(http.StatusOK)
+}
+
+func DeleteUserFromBd(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	storage.DeleteUser(databas.ConnectDB(), id)
+	c.Status(http.StatusOK)
+}
+
+func UpdateUsernameBd(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var user models.UpdatedUsernameUser
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	storage.UpdateUsername(databas.ConnectDB(), id, user.Username)
+	c.Status(http.StatusOK)
+}
+
+func UpdateEmail(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var user models.UpdatedEmailUser
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	storage.UpdateEmail(databas.ConnectDB(), id, user.Email)
 }
