@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,11 +14,11 @@ import (
 
 // Task
 func GetTasks(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("userId"))
+	userId, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {
 		log.Println(err)
 	}
-	tasks := storage.GetAll(databas.ConnectDB(), id)
+	tasks := storage.GetAll(databas.ConnectDB(), userId)
 	c.JSON(http.StatusOK, tasks)
 }
 
@@ -39,7 +40,7 @@ func CreateTask(c *gin.Context) {
 
 func UpdateTask(c *gin.Context) {
 	var tsk models.Task
-	userId, err := strconv.Atoi(c.Param("userId"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Println(err)
 		return
@@ -48,7 +49,8 @@ func UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	tsk.UserID = userId
+	tsk.Id = id
+	fmt.Println(tsk)
 	storage.UpdateTask(databas.ConnectDB(), tsk)
 	c.Status(http.StatusOK)
 }

@@ -9,11 +9,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var tasks = make(map[int]models.Task)
-
 // TASKS
 func GetAll(db *sql.DB, id int) []models.Task {
-	rows, err := db.Query(`SELECT id,title,content FROM notes WHERE user_id=$1`, id)
+	rows, err := db.Query(`SELECT id, user_id, title, content FROM notes WHERE user_id=$1`, id)
 	if err != nil {
 		log.Println(err)
 	}
@@ -22,7 +20,7 @@ func GetAll(db *sql.DB, id int) []models.Task {
 	var Tasks []models.Task
 	for rows.Next() {
 		var tsk models.Task
-		err := rows.Scan(&tsk.Id, &tsk.Title, &tsk.Content)
+		err := rows.Scan(&tsk.Id, &tsk.UserID, &tsk.Title, &tsk.Content)
 		if err != nil {
 			log.Println(err)
 		}
@@ -41,18 +39,19 @@ func AddTask(db *sql.DB, t models.Task) int {
 }
 
 func UpdateTask(db *sql.DB, t models.Task) {
-	_, err := db.Exec(`UPDATE notes
-		SET title = $1, content = $2, updated_at = NOW()
+	fmt.Println(t)
+	err := db.QueryRow(`UPDATE notes
+		SET title = $1, content = $2
 		WHERE id = $3`, t.Title, t.Content, t.Id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
 func DeleteTask(db *sql.DB, noteID int) {
-	_, err := db.Exec(`DELETE FROM notes WHERE id = $1`, noteID)
+	err := db.QueryRow(`DELETE FROM notes WHERE id = $1`, noteID)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
