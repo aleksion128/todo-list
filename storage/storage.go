@@ -40,7 +40,7 @@ func AddTask(db *sql.DB, t models.Task) int {
 
 func UpdateTask(db *sql.DB, t models.Task) {
 	fmt.Println(t)
-	err := db.QueryRow(`UPDATE notes
+	_, err := db.Exec(`UPDATE notes
 		SET title = $1, content = $2
 		WHERE id = $3`, t.Title, t.Content, t.Id)
 	if err != nil {
@@ -49,7 +49,7 @@ func UpdateTask(db *sql.DB, t models.Task) {
 }
 
 func DeleteTask(db *sql.DB, noteID int) {
-	err := db.QueryRow(`DELETE FROM notes WHERE id = $1`, noteID)
+	_, err := db.Exec(`DELETE FROM notes WHERE id = $1`, noteID)
 	if err != nil {
 		log.Println(err)
 	}
@@ -57,7 +57,10 @@ func DeleteTask(db *sql.DB, noteID int) {
 
 // USER
 func HashPass(pass string) string {
-	password, _ := bcrypt.GenerateFromPassword([]byte(pass), 14)
+	password, err := bcrypt.GenerateFromPassword([]byte(pass), 14)
+	if err != nil {
+		log.Println(err)
+	}
 	return string(password)
 }
 
@@ -80,21 +83,21 @@ func DeleteUser(db *sql.DB, id int) {
 }
 
 func UpdateUsername(db *sql.DB, id int, username string) {
-	err := db.QueryRow(`UPDATE users SET username = $1 WHERE id = $2`, username, id)
+	_, err := db.Exec(`UPDATE users SET username = $1 WHERE id = $2`, username, id)
 	if err != nil {
 		fmt.Println("Проблемы с обновлением пользователя в базе данных")
 	}
 }
 
 func UpdateEmail(db *sql.DB, id int, email string) {
-	err := db.QueryRow(`UPDATE users SET email=$1 WHERE id = $2`, email, id)
+	_, err := db.Exec(`UPDATE users SET email=$1 WHERE id = $2`, email, id)
 	if err != nil {
 		fmt.Println("Проблемы с обновлением пользователя в базе данных")
 	}
 }
 
 func UpdatePassword(db *sql.DB, id int, password string) {
-	err := db.QueryRow(`UPDATE users SET password_hash=$1 WHERE id = $2`, HashPass(password), id)
+	_, err := db.Exec(`UPDATE users SET password_hash=$1 WHERE id = $2`, HashPass(password), id)
 	if err != nil {
 		fmt.Println("Проблемы с обновлением пользователя в базе данных")
 	}
