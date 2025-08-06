@@ -11,34 +11,9 @@ import (
 
 var tasks = make(map[int]models.Task)
 
-func GetAll() []models.Task {
-	res := make([]models.Task, 0, len(tasks))
-	for _, v := range tasks {
-		res = append(res, v)
-	}
-	return res
-}
-
-func AddTask(t models.Task) {
-	tasks[t.Id] = t
-}
-
 // TASKS
-func CreateNote(db *sql.DB, userID int, title, content string) int {
-	var id int
-	err := db.QueryRow(`INSERT INTO notes (user_id, title, content)
-		VALUES ($1, $2, $3)
-		RETURNING id`, userID, title, content).Scan(&id)
-	if err != nil {
-		log.Println(err)
-	}
-	return id
-}
-
-func GetUserNotes(db *sql.DB, userID int) []models.Task {
-	rows, err := db.Query(`SELECT id, title, content 
-		FROM notes 
-		WHERE user_id = $1`, userID)
+func GetAll(db *sql.DB, id int) []models.Task {
+	rows, err := db.Query(`SELECT id,title,content FROM notes WHERE user_id=$1`, id)
 	if err != nil {
 		log.Println(err)
 	}
@@ -48,37 +23,37 @@ func GetUserNotes(db *sql.DB, userID int) []models.Task {
 	for rows.Next() {
 		var tsk models.Task
 		err := rows.Scan(&tsk.Id, &tsk.Title, &tsk.Content)
-		tsk.UserID = userID
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		Tasks = append(Tasks, tsk)
 	}
 	return Tasks
 }
 
-func UpdateNote(db *sql.DB, noteID int, title, content string) {
+func AddTask(db *sql.DB, t models.Task) int {
+	var id int
+	err := db.QueryRow(`INSERT INTO notes (user_id, title, content) VALUES ($1,$2,$3) RETURNING id`, t.UserID, t.Title, t.Content).Scan(&id)
+	if err != nil {
+		log.Println(err)
+	}
+	return id
+}
+
+func UpdateTask(db *sql.DB, t models.Task) {
 	_, err := db.Exec(`UPDATE notes
 		SET title = $1, content = $2, updated_at = NOW()
-		WHERE id = $3`, title, content, noteID)
+		WHERE id = $3`, t.Title, t.Content, t.Id)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func DeleteNote(db *sql.DB, noteID int) {
+func DeleteTask(db *sql.DB, noteID int) {
 	_, err := db.Exec(`DELETE FROM notes WHERE id = $1`, noteID)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func ChangeTask(t models.Task) {
-	tasks[t.Id] = t
-}
-
-func DeleteTask(id int) {
-	delete(tasks, id)
 }
 
 // USER
